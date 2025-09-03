@@ -5,27 +5,33 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
-    "dev": "nodemon --exec \"node -r esbuild-register ./src/index.ts\" -e .ts",
+    "node:dev": "nodemon --exec \"node -r esbuild-register ./src/index.ts\" -e .ts",
+    "dev": "bun --watch ./src/index.ts",
     "lint": "tsc --noEmit && eslint \"src/**/*.ts*\" --max-warnings 0",
     "start": "node -r esbuild-register ./src/index.ts",
     "test": "jest --detectOpenHandles"
   },
   "jest": {
-    "preset": "@repo/jest-presets/node"
+    "preset": "@toolydooly/jest-presets/node"
   },
   "dependencies": {
-    "@repo/logger": "*",
+    "@types/express-http-proxy": "^1.6.7",
     "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^4.18.3",
+    "express-http-proxy": "^2.1.1",
+    "http-proxy-middleware": "^3.0.5",
+    "moleculer": "^0.14.35",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
-    "@repo/eslint-config": "*",
-    "@repo/jest-presets": "*",
-    "@repo/typescript-config": "*",
+    "@toolydooly/eslint-config": "*",
+    "@toolydooly/jest-presets": "*",
+    "@toolydooly/typescript-config": "*",
     "@types/body-parser": "^1.19.5",
+    "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/morgan": "^1.9.9",

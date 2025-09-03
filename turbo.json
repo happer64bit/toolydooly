@@ -3,9 +3,9 @@
   "tasks": {
     "build": {
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**"],
+      "outputs": ["dist/**"],
       "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_API_HOST"]
+      "env": ["AUTH_DATABASE_URL"]
     },
     "test": {
       "outputs": ["coverage/**"],
@@ -16,7 +16,8 @@
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": ["AUTH_DATABASE_URL", "AUTH_REDIS_URL", "QUEUE_URL", "TODO_DATABASE_URL"]
     },
     "clean": {
       "cache": false

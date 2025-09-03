@@ -1,0 +1,31 @@
+{
+  "name": "@toolydooly/validation-schemas",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "exports": {
+    "./auth": {
+      "default": "./dist/auth.js",
+      "types": "./dist/auth.d.ts",
+      "development": "./src/auth.ts"
+    },
+    "./todo": {
+      "default": "./dist/todo.js",
+      "types": "./dist/todo.d.ts",
+      "development": "./src/todo.ts"
+    }
+  },
+  "dependencies": {
+    "@toolydooly/typescript-config": "*"
+  }
+}

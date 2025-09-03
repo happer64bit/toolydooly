@@ -1,16 +1,4 @@
-version: "3"
-
 services:
-  web:
-    container_name: web
-    build:
-      context: .
-      dockerfile: ./apps/web/Dockerfile
-    restart: always
-    ports:
-      - 3000:3000
-    networks:
-      - app_network
   api:
     container_name: api
     build:
@@ -18,12 +6,95 @@ services:
       dockerfile: ./apps/api/Dockerfile
     restart: always
     ports:
-      - 3001:3001
+      - "3001:3001"
     networks:
       - app_network
 
-# Define a network, which allows containers to communicate
-# with each other, by using their container name as a hostname
+  auth_service:
+    container_name: auth_service
+    build:
+      context: .
+      dockerfile: ./apps/auth-service/Dockerfile
+    restart: always
+    ports:
+      - "3002:3002"
+    environment:
+      - REDIS_URL=redis://:redis@redis:6379
+    depends_on:
+      - auth_db
+      - redis
+    networks:
+      - app_network
+    volumes:
+      - ./keys:/app/keys
+
+  redis:
+    container_name: redis
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app_network
+    command: >
+      redis-server
+      --requirepass redis
+      --appendonly yes
+      --protected-mode no
+
+  auth_db:
+    image: postgres:latest
+    container_name: auth_db
+    restart: always
+    environment:
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+      POSTGRES_DB: auth_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  todo_db:
+    image: mongo:latest
+    container_name: todo_db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: todo_user
+      MONGO_INITDB_ROOT_PASSWORD: todo_pass
+      MONGO_INITDB_DATABASE: todo_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - todo_db_data:/data/db
+    networks:
+      - app_network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: rabbitmq
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - app_network
+
 networks:
   app_network:
-    external: true
+    driver: bridge
+
+volumes:
+  auth_db_data:
+  todo_db_data:
+  redis_data:
+  rabbitmq_data:
