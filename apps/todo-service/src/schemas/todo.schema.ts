@@ -1,0 +1,64 @@
+import * as mongoose from 'mongoose';
+
+export interface Todo {
+  text: string;
+  body?: string;
+  is_done: boolean;
+  done_at?: Date;
+  deadline?: Date;
+  remind_at?: Date;
+  user_id: String
+  is_deleted: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export const TodoSchema = new mongoose.Schema<Todo>({
+  text: {
+    type: String,
+    required: true,
+    maxlength: 1000,
+    trim: true
+  },
+  body: {
+    type: String,
+    maxlength: 5000,
+    default: ""
+  },
+  is_done: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
+  done_at: {
+    type: Date,
+    default: null
+  },
+  deadline: {
+    type: Date,
+    default: null
+  },
+  remind_at: {
+    type: Date,
+    default: null
+  },
+  is_deleted: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
+  user_id: {
+    type: String,
+    required: true
+  },
+  created_at: {
+    type: Date,
+    required: true,
+    default: Date.now
+  },
+  updated_at: {
+    type: Date,
+    required: true,
+    default: Date.now
+  },
+});
