@@ -8,7 +8,7 @@ export const createUser = async (req: Request, res: Response) => {
 
     try {
         const { user, accessToken, refreshToken } = await authService.registerUser(parsed.data.username, parsed.data.email, parsed.data.password);
-        res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: "none" });
+        res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: "none", secure: true });
         res.status(201).json({ status: "success", data: user, access_token: accessToken });
     } catch (err: any) {
         res.status(409).json({ status: "error", message: err.message });
@@ -21,7 +21,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     try {
         const { user, accessToken, refreshToken } = await authService.loginUser(parsed.data.usernameOrEmail, parsed.data.password);
-        if (refreshToken) res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: "none" });
+        if (refreshToken) res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: "none", secure: true });
         res.status(200).json({ status: "success", data: user, access_token: accessToken });
     } catch (err: any) {
         res.status(401).json({ status: "error", message: err.message });
