@@ -25,8 +25,7 @@ export class AuthGuard implements CanActivate {
     }
 
     const sessionData = await response.json();
-    console.log("SESSION DATA")
-    console.log(sessionData);
+    
     (request as any).user = sessionData;
 
     return true;
