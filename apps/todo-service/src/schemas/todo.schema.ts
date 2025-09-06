@@ -7,7 +7,8 @@ export interface Todo {
   done_at?: Date;
   deadline?: Date;
   remind_at?: Date;
-  user_id: String
+  user_id: string;
+  priority: 1 | 2 | 3;
   is_deleted: boolean;
   created_at: Date;
   updated_at: Date;
@@ -50,6 +51,11 @@ export const TodoSchema = new mongoose.Schema<Todo>({
   user_id: {
     type: String,
     required: true
+  },
+  priority: {
+    type: Number,
+    required: true,
+    default: 2
   },
   created_at: {
     type: Date,

@@ -1,12 +1,6 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsDate, IsEnum, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
-
-enum Priority {
-    high,
-    regular,
-    low
-}
 
 export class CreateTodoDto {
     @IsString()
@@ -16,9 +10,8 @@ export class CreateTodoDto {
     @IsOptional()
     body?: string
 
-    @IsEnum(Priority)
-    @IsString()
-    priority: Priority
+    @IsNumber()
+    priority: 1 | 2 | 3;
 
     @IsDate()
     @Type(() => Date)
