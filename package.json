@@ -7,6 +7,7 @@
     "clean": "turbo run clean",
     "dev": "dotenv -- turbo run dev",
     "dev:backend": "dotenv -- turbo run dev --filter='!web-app'",
+    "dev:frontend": "dotenv -- turbo run dev --filter='web-app'",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "test": "dotenv -- turbo run test"
