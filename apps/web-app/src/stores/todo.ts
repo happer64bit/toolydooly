@@ -23,6 +23,30 @@ export const useTodo = defineStore("todo", {
         } catch {
             return false;
         }
+    },
+    async createTodo(body: {
+        text: string,
+        priority: string
+    }) {
+        const priorityMap: Record<string, number> = {
+            "high": 1,
+            "medium": 2,
+            "low": 3
+        };
+
+        const priorityInt = priorityMap[body.priority];
+
+        if(!priorityInt || !body.text) throw new Error("Canceling Todo Creation");
+
+        try {
+            const response = await api.post("/todo", {
+                text: body.text,
+                priority: priorityInt
+            });
+            return response.data;
+        } catch {
+            throw new Error("Failed To Create Todo")
+        }
     }
   },
 });
