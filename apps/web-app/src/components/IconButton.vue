@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { defineProps } from 'vue'
-
 type ButtonProps = {
   type?: 'button' | 'submit' | 'reset'
   onClick?: (event: MouseEvent) => void

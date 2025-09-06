@@ -9,18 +9,22 @@ const router = createRouter({
             path: '/',
             name: 'home',
             component: HomeView,
-            meta: { requiresAuth: true }
+            meta: { requiresAuth: true, title: "ToolyDooly - App" },
         },
         {
             path: "/auth/sign-in",
             name: 'sign-in',
-            component: async () => await import("@/views/SignInView.vue")
+            component: async () => await import("@/views/SignInView.vue"),
+            meta: {
+                title: "Sign In - ToolyDooly"
+            }
         }
     ],
 })
 
 router.beforeResolve(async (to) => {
     const auth = useAuth();
+    document.title = to.meta.title as string
 
     if (auth.status === "unauthenticated") {
         await auth.checkAuth();
