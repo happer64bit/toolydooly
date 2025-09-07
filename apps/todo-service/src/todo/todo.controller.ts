@@ -51,14 +51,16 @@ export class TodoController {
     @Get()
     @UseGuards(AuthGuard)
     async listTodos(
-        @Query('page') page = '0',
         @Query('limit') limit = '10',
+        @Query("hide_completed") hideCompleted: "false" | "true" = "false",
+        @User() user: IUser
     ) {
         try {
-            const pageNum = parseInt(page, 10) || 0;
             const limitNum = parseInt(limit, 10) || 10;
+            
+            const hideCompletedBool = hideCompleted === 'true';
 
-            return await this.todoService.getTodos(pageNum, limitNum);
+            return await this.todoService.getTodos(limitNum, hideCompletedBool, user.uid);
         } catch (err) {
             throw new HttpException(
                 'Failed to fetch todos: ' + err.message,
