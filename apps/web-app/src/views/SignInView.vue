@@ -38,37 +38,40 @@ const form = useForm({
                 </div>
 
                 <form @submit.prevent="form.handleSubmit" class="space-y-5 mb-4">
-                    <form.Field name="usernameOrEmail">
-                        <template v-slot="{ field }">
-                            <label :for="field.name" class="text-sm block mb-1">Username Or Email</label>
-                            <input :id="field.name" :name="field.name" type="text"
-                                @input="(e) => field.handleChange((e.target as HTMLInputElement).value)"
-                                placeholder="johndoe or johndoe@mail.com" autocomplete="email"
-                                class="block px-4 py-3 border border-gray-200 w-full outline-teal-400 rounded mt-1" />
-                            <em role="alert" v-if="!field.state.meta.isValid">{{ field.state.meta.errors.join(', ')
+                    <div>
+                        <form.Field name="usernameOrEmail">
+                            <template v-slot="{ field }">
+                                <label :for="field.name" class="text-sm block mb-1">Username Or Email</label>
+                                <input :id="field.name" :name="field.name" type="text"
+                                    @input="(e) => field.handleChange((e.target as HTMLInputElement).value)"
+                                    placeholder="johndoe or johndoe@mail.com" autocomplete="email"
+                                    class="block px-4 py-3 border border-gray-200 w-full outline-teal-400 rounded mt-1" />
+                                <em role="alert" v-if="!field.state.meta.isValid">{{ field.state.meta.errors.join(', ')
+                                    }}</em>
+                            </template>
+                        </form.Field>
+                    </div>
+
+                    <div>
+                        <form.Field name="password">
+                            <template v-slot="{ field }">
+                                <div class="flex justify-between items-center mb-1">
+                                    <label :for="field.name" class="text-sm block">Password</label>
+                                    <button type="button" class="text-sm flex items-center gap-1"
+                                        @click="showPassword = !showPassword">
+                                        <component :is="showPassword ? EyeOpenIcon : EyeClosedIcon" />
+                                        {{ showPassword ? 'Hide' : 'Show' }}
+                                    </button>
+                                </div>
+                                <input :id="field.name" :name="field.name" :type="showPassword ? 'text' : 'password'"
+                                    @input="(e) => field.handleChange((e.target as HTMLInputElement).value)"
+                                    placeholder="********" autocomplete="current-password"
+                                    class="block px-4 py-3 border border-gray-200 w-full outline-teal-400 rounded mt-1" />
+                                <em role="alert" v-if="!field.state.meta.isValid">{{ field.state.meta.errors.join(', ')
                                 }}</em>
-                        </template>
-                    </form.Field>
-
-
-                    <form.Field name="password">
-                        <template v-slot="{ field }">
-                            <div class="flex justify-between items-center mb-1">
-                                <label :for="field.name" class="text-sm block">Password</label>
-                                <button type="button" class="text-sm flex items-center gap-1"
-                                    @click="showPassword = !showPassword">
-                                    <component :is="showPassword ? EyeOpenIcon : EyeClosedIcon" />
-                                    {{ showPassword ? 'Hide' : 'Show' }}
-                                </button>
-                            </div>
-                            <input :id="field.name" :name="field.name" :type="showPassword ? 'text' : 'password'"
-                                @input="(e) => field.handleChange((e.target as HTMLInputElement).value)"
-                                placeholder="********" autocomplete="current-password"
-                                class="block px-4 py-3 border border-gray-200 w-full outline-teal-400 rounded mt-1" />
-                            <em role="alert" v-if="!field.state.meta.isValid">{{ field.state.meta.errors.join(', ')
-                            }}</em>
-                        </template>
-                    </form.Field>
+                            </template>
+                        </form.Field>
+                    </div>
 
                     <form.Subscribe>
                         <template v-slot="{ canSubmit, isSubmitting }">
