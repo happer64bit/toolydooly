@@ -25,7 +25,7 @@ export class TodoService {
 
     return this.todoModel
       .find({ ...query, user_id: user_id })
-      .sort({ priorityOrder: -1, updated_at: -1 })
+      .sort({ is_done: 1, priorityOrder: -1, updated_at: -1 })
       .limit(limit)
       .exec();
   }
