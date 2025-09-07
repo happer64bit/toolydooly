@@ -2,12 +2,15 @@
 import BottomChatContainer from '@/components/BottomChatContainer.vue'
 import FilterTodo from '@/components/FilterTodo.vue'
 import { useAuth } from '@/stores/auth'
+import { useFilter } from '@/stores/filter'
 import { useTodo } from '@/stores/todo'
 import { useMutation, useQuery } from '@tanstack/vue-query'
+import { watch } from 'vue'
 
 // stores
 const auth = useAuth()
 const todo = useTodo()
+const filter = useFilter()
 
 // infer todo type from store
 type Todo = Awaited<ReturnType<typeof todo.fetchTodo>>[number]
@@ -15,9 +18,19 @@ type Todo = Awaited<ReturnType<typeof todo.fetchTodo>>[number]
 // query
 const todoQuery = useQuery<Todo[]>({
     queryKey: ['todos'],
-    queryFn: () => todo.fetchTodo(10, 0),
+    queryFn: () => todo.fetchTodo({
+        limit: 10,
+        hideCompleted: filter.hideCompleted
+    }),
     refetchOnWindowFocus: false,
 })
+
+watch(
+  () => filter.hideCompleted,
+  () => {
+    todoQuery.refetch()
+  }
+)
 
 // toggle mutation
 const toggleMutation = useMutation({
@@ -107,7 +120,7 @@ const createTodoMutation = useMutation({
         </div>
     </div>
 
-    <div class="fixed bottom-0 left-0 w-full flex justify-center p-4 shadow-md">
+    <div class="sticky bottom-0 left-0 w-full flex justify-center p-4 shadow-md bg-gray-50">
         <BottomChatContainer @submit="data => createTodoMutation.mutate(data)" />
     </div>
 </template>

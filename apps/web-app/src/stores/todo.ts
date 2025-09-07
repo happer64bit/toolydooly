@@ -4,9 +4,12 @@ import api from "@/lib/axios";
 
 export const useTodo = defineStore("todo", {
   actions: {
-    async fetchTodo(limit: number, page: number): Promise<Todo[]> {
+    async fetchTodo({ limit, hideCompleted } : {
+        limit: number,
+        hideCompleted: boolean
+    }): Promise<Todo[]> {
       try {
-        const { data } = await api.get(`/todo?limit=${limit}&page=${page}`);
+        const { data } = await api.get(`/todo?limit=${limit}&hide_completed=${hideCompleted}`);
         return data;
       } catch (err) {
         console.error("Fetching Todo Failed", err);
