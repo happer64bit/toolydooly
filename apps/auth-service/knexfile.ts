@@ -1,1 +1,1 @@
-export { default }from './src/knexfile';
+export { default } from './src/knexfile';
