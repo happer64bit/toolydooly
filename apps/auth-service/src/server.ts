@@ -1,7 +1,7 @@
 import { urlencoded } from "body-parser";
 import express, { type Express } from "express";
 import morgan from "morgan";
-import { createUser, loginUser, refresh, verify } from "./auth.controller";
+import { createUser, loginUser, logout, refresh, verify } from "./auth.controller";
 import AuthMiddleware from "./auth.middleware";
 import cookieParser from "cookie-parser";
 import cors from 'cors';
@@ -22,6 +22,7 @@ export const createServer = (): Express => {
     .post("/login", loginUser)
     .get("/session", AuthMiddleware, verify)
     .get("/refresh", refresh)
+    .get("/logout", AuthMiddleware, logout)
 
   return app;
 };

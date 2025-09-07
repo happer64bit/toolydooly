@@ -54,3 +54,16 @@ export const refresh = async (req: Request, res: Response) => {
         res.status(401).json({ status: "error", message: err.message });
     }
 };
+
+export const logout = async (req: Request, res: Response) => {
+    res.clearCookie("refresh_token", {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+    });
+
+    res.status(200).json({
+        status: "success",
+        message: "Logged out successfully",
+    });
+};

@@ -4,18 +4,22 @@ import FilterTodo from '@/components/FilterTodo.vue'
 import { useAuth } from '@/stores/auth'
 import { useFilter } from '@/stores/filter'
 import { useTodo } from '@/stores/todo'
-import { useMutation, useQuery } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { watch } from 'vue'
+import { useRouter } from 'vue-router'
 
 // stores
 const auth = useAuth()
 const todo = useTodo()
 const filter = useFilter()
+const router = useRouter();
 
 // infer todo type from store
 type Todo = Awaited<ReturnType<typeof todo.fetchTodo>>[number]
 
 // query
+const queryClient = useQueryClient();
+
 const todoQuery = useQuery<Todo[]>({
     queryKey: ['todos'],
     queryFn: () => todo.fetchTodo({
@@ -26,37 +30,40 @@ const todoQuery = useQuery<Todo[]>({
 })
 
 watch(
-  () => filter.hideCompleted,
-  () => {
-    todoQuery.refetch()
-  }
+    () => filter.hideCompleted,
+    () => {
+        todoQuery.refetch()
+    }
 )
 
 // toggle mutation
 const toggleMutation = useMutation({
     mutationFn: (id: string) => todo.toggleTodo(id),
     onMutate: async (id: string) => {
-        const previousTodos = todoQuery.data.value?.slice() ?? []
+        await queryClient.cancelQueries({ queryKey: ['todos'] })
 
-        if (todoQuery.data.value) {
-            todoQuery.data.value = todoQuery.data.value.map(t =>
+        const previousTodos = queryClient.getQueryData<Todo[]>(['todos']) ?? []
+
+        queryClient.setQueryData<Todo[]>(['todos'], old =>
+            old?.map(t =>
                 t._id === id
                     ? { ...t, is_done: !t.is_done, done_at: !t.is_done ? new Date() : undefined }
                     : t
-            )
-        }
+            ) ?? []
+        )
 
         return { previousTodos }
     },
     onError: (_err, _id, context) => {
         if (context?.previousTodos) {
-            todoQuery.data.value = context.previousTodos
+            queryClient.setQueryData(['todos'], context.previousTodos)
         }
     },
     onSettled: () => {
         todoQuery.refetch()
     },
 })
+
 
 // create mutation
 const createTodoMutation = useMutation({
@@ -77,7 +84,9 @@ const createTodoMutation = useMutation({
                 Sign In
             </RouterLink>
             <button to="/auth/logout" class="bg-black px-4 py-2 rounded-full text-white hover:opacity-90 cursor-pointer"
-                v-if="auth.status == 'authenticated'">
+                v-if="auth.status == 'authenticated'" @click="auth.logout(async () => {
+                    await router.push('/auth/sign-in');
+                })">
                 Logout
             </button>
         </div>
@@ -109,12 +118,7 @@ const createTodoMutation = useMutation({
                     </div>
 
                     <input type="checkbox" class="w-6 h-6 border-gray-900 rounded bg-black checked:bg-gray-200"
-                        :checked="todoItem.is_done" @change="
-                            () => {
-                                todoItem.is_done = !todoItem.is_done
-                                toggleMutation.mutateAsync(todoItem._id)
-                            }
-                        " />
+                        :checked="todoItem.is_done" @change="() => toggleMutation.mutate(todoItem._id)" />
                 </label>
             </TransitionGroup>
         </div>
