@@ -18,13 +18,21 @@ const router = createRouter({
             meta: {
                 title: "Sign In - ToolyDooly"
             }
+        },
+        {
+            path: "/auth/create-user",
+            name: 'create-user',
+            component: async () => await import("@/views/CreateUserView.vue"),
+            meta: {
+                title: "Create User - ToolyDooly"
+            }
         }
     ],
 })
 
 router.beforeResolve(async (to) => {
     const auth = useAuth();
-    document.title = to.meta.title as string
+    document.title = to.meta.title as string ?? "Not Found"
 
     if (auth.status === "unauthenticated") {
         await auth.checkAuth();
