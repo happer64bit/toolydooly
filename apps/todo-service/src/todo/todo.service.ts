@@ -16,11 +16,16 @@ export class TodoService {
     });
   }
 
-  async getTodos(page = 0, limit = 10): Promise<Todo[]> {
+  async getTodos(limit = 10, hideCompleted: boolean = false, user_id: string): Promise<Todo[]> {
+    const query: Record<string, any> = { is_deleted: false }
+
+    if (hideCompleted) {
+      query.is_done = false;
+    }
+
     return this.todoModel
-      .find({ is_deleted: false, is_done: 0 })
-      .sort({ priorityOrder: -1, updated_at: -1 }) // false first
-      .skip(page * limit)
+      .find({ ...query, user_id: user_id })
+      .sort({ priorityOrder: -1, updated_at: -1 })
       .limit(limit)
       .exec();
   }
