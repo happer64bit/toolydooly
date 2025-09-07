@@ -21,25 +21,12 @@ export const TodoSchema = new mongoose.Schema<Todo>({
     maxlength: 1000,
     trim: true
   },
-  body: {
-    type: String,
-    maxlength: 5000,
-    default: ""
-  },
   is_done: {
     type: Boolean,
     required: true,
     default: false
   },
   done_at: {
-    type: Date,
-    default: null
-  },
-  deadline: {
-    type: Date,
-    default: null
-  },
-  remind_at: {
     type: Date,
     default: null
   },
