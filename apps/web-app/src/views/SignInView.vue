@@ -46,8 +46,8 @@ const form = useForm({
                                     @input="(e) => field.handleChange((e.target as HTMLInputElement).value)"
                                     placeholder="johndoe or johndoe@mail.com" autocomplete="email"
                                     class="block px-4 py-3 border border-gray-200 w-full outline-teal-400 rounded mt-1" />
-                                <em role="alert" v-if="!field.state.meta.isValid">{{ field.state.meta.errors.join(', ')
-                                    }}</em>
+                                <em role="alert" v-if="!field.state.meta.isValid">{{field.state.meta.errors.map((err) =>
+                                    err?.message).join(", ")}}</em>
                             </template>
                         </form.Field>
                     </div>
@@ -67,8 +67,8 @@ const form = useForm({
                                     @input="(e) => field.handleChange((e.target as HTMLInputElement).value)"
                                     placeholder="********" autocomplete="current-password"
                                     class="block px-4 py-3 border border-gray-200 w-full outline-teal-400 rounded mt-1" />
-                                <em role="alert" v-if="!field.state.meta.isValid">{{ field.state.meta.errors.join(', ')
-                                }}</em>
+                                <em role="alert" v-if="!field.state.meta.isValid">{{field.state.meta.errors.map((err) =>
+                                    err?.message).join(", ")}}</em>
                             </template>
                         </form.Field>
                     </div>
