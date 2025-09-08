@@ -6,13 +6,21 @@ import AuthMiddleware from "./auth.middleware";
 import cookieParser from "cookie-parser";
 import cors from 'cors';
 
+const allowedOrigins = ["http://localhost:4173", "http://localhost:5173"];
+
 export const createServer = (): Express => {
   const app = express();
   app
     .disable("x-powered-by")
     .use(morgan("dev"))
     .use(cors({
-      origin: "http://localhost:5173",
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
       credentials: true
     }))
     .use(urlencoded({ extended: true }))

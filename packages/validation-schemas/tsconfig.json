@@ -2,7 +2,6 @@
   "extends": "@toolydooly/typescript-config/base.json",
   "compilerOptions": {
     "moduleResolution": "bundler",
-    "lib": ["ES2015"],
     "module": "esnext",
     "outDir": "./dist",
     "rootDir": "./src"

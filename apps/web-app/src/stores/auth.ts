@@ -102,7 +102,7 @@ export const useAuth = defineStore("auth", {
             }
         },
 
-        async logout(onSuccess: () => void) {
+        async logout(onSuccess?: () => void) {
             if (this.status === "authenticated") {
                 try {
                     await api.get("/auth/logout");
@@ -114,7 +114,7 @@ export const useAuth = defineStore("auth", {
 
                     this.stopAutoFetch();
 
-                    onSuccess();
+                    if(onSuccess) onSuccess();
                     return;
                 } catch {
                     return;

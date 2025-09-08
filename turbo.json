@@ -2,10 +2,11 @@
   "$schema": "https://turborepo.com/schema.json",
   "tasks": {
     "build": {
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "src/**", "vite.config.ts", "tsconfig.json", "package.json"],
       "outputs": ["dist/**"],
       "dependsOn": ["^build"],
-      "env": ["AUTH_DATABASE_URL"]
+      "env": ["AUTH_DATABASE_URL"],
+      "cache": true
     },
     "test": {
       "outputs": ["coverage/**"],
