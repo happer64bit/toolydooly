@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "./libs/jwt";
 import * as cache from "./libs/cache";
 import * as userRepo from "./user.repostiory";
-import { JsonWebTokenError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 export default async function AuthMiddleware(
   req: Request,
@@ -62,7 +62,7 @@ export default async function AuthMiddleware(
 
     next();
   } catch (error) {
-    if (error instanceof JsonWebTokenError) {
+    if (error instanceof jwt.JsonWebTokenError) {
       return res
         .status(401)
         .json({ success: false, message: error.message });

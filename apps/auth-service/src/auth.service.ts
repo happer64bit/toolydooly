@@ -8,7 +8,7 @@ export const registerUser = async (username: string, email: string, password: st
     if (existing) throw new Error(existing.email === email ? "Email exists" : "Username exists");
 
     const hashedPassword = await hash(password, 12);
-    const [user] = await userRepo.createUserInDb({ username, email, password: hashedPassword });
+    const [user] = await userRepo.upsertUserInDb({ username, email, password: hashedPassword });
 
     await cache.setCache(email, { uid: user.uid, username: user.username, email: user.email });
 

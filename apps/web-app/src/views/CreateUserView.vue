@@ -5,6 +5,8 @@ import { useForm } from '@tanstack/vue-form'
 import { createUserSchema } from '@toolydooly/validation-schemas/auth'
 import { useAuth } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import 'vue-sonner/style.css'
+import { toast, Toaster } from 'vue-sonner'
 
 const showPassword = ref(false)
 
@@ -21,7 +23,12 @@ const form = useForm({
         onSubmit: createUserSchema,
     },
     onSubmit: async ({ value }) => {
-        await auth.createUser(value, async () => await push("/"));
+        try {
+            await auth.createUser(value);
+            await push("/")
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Create User failed")
+        }
     }
 })
 </script>
@@ -47,7 +54,7 @@ const form = useForm({
                                     @input="(e) => field.handleChange((e.target as HTMLInputElement).value)"
                                     placeholder="johndoe@example.com" autocomplete="email"
                                     class="block px-4 py-3 border border-gray-200 w-full outline-teal-400 rounded mt-1" />
-                                <em role="alert" v-if="!field.state.meta.isValid">{{field.state.meta.errors.map((err) =>
+                                <em role="alert" class="text-red-500" v-if="!field.state.meta.isValid">{{field.state.meta.errors.map((err) =>
                                     err?.message).join(", ")}}</em>
                             </template>
                         </form.Field>
@@ -61,8 +68,8 @@ const form = useForm({
                                     @input="(e) => field.handleChange((e.target as HTMLInputElement).value)"
                                     placeholder="johndoe" autocomplete="username"
                                     class="block px-4 py-3 border border-gray-200 w-full outline-teal-400 rounded mt-1" />
-                                <em role="alert" v-if="!field.state.meta.isValid">{{ field.state.meta.errors.join(', ')
-                                    }}</em>
+                                <em role="alert" class="text-red-500" v-if="!field.state.meta.isValid">{{field.state.meta.errors.map((err) =>
+                                    err?.message).join(", ")}}</em>
                             </template>
                         </form.Field>
                     </div>
@@ -82,8 +89,8 @@ const form = useForm({
                                     @input="(e) => field.handleChange((e.target as HTMLInputElement).value)"
                                     placeholder="********" autocomplete="current-password"
                                     class="block px-4 py-3 border border-gray-200 w-full outline-teal-400 rounded mt-1" />
-                                <em role="alert" v-if="!field.state.meta.isValid">{{ field.state.meta.errors.join(', ')
-                                    }}</em>
+                                <em role="alert" class="text-red-500" v-if="!field.state.meta.isValid">{{field.state.meta.errors.map((err) =>
+                                    err?.message).join(", ")}}</em>
                             </template>
                         </form.Field>
                     </div>
@@ -100,4 +107,5 @@ const form = useForm({
             </div>
         </div>
     </div>
+    <Toaster />
 </template>

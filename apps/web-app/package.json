@@ -26,7 +26,8 @@
     "radix-vue": "^1.9.17",
     "tailwindcss": "^4.1.12",
     "vue": "^3.5.18",
-    "vue-router": "^4.5.1"
+    "vue-router": "^4.5.1",
+    "vue-sonner": "^2.0.8"
   },
   "devDependencies": {
     "@eslint-community/eslint-utils": "^4.8.0",

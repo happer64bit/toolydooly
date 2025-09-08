@@ -5,6 +5,9 @@ import { useForm } from '@tanstack/vue-form'
 import { loginUserSchema } from '@toolydooly/validation-schemas/auth'
 import { useAuth } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import { Toaster, toast } from 'vue-sonner'
+
+import 'vue-sonner/style.css'
 
 const showPassword = ref(false)
 
@@ -20,7 +23,14 @@ const form = useForm({
         onSubmit: loginUserSchema,
     },
     onSubmit: async ({ value }) => {
-        await auth.login(value, async () => await push("/"));
+        console.log("Submit");
+
+        try {
+            await auth.login(value)
+            await push("/")
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Login failed")
+        }
     }
 })
 </script>
@@ -77,7 +87,7 @@ const form = useForm({
                         <template v-slot="{ canSubmit, isSubmitting }">
                             <button type="submit" :disabled="isSubmitting || !canSubmit"
                                 class="w-full bg-teal-600 text-white py-3 rounded-full cursor-pointer hover:bg-teal-700 active:bg-teal-800 transition duration-100 mt-4">
-                                Login
+                                Register
                             </button>
                         </template>
                     </form.Subscribe>
@@ -85,4 +95,5 @@ const form = useForm({
             </div>
         </div>
     </div>
+    <Toaster />
 </template>

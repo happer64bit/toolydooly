@@ -1,4 +1,4 @@
-import { urlencoded } from "body-parser";
+import bodyParser from "body-parser";
 import express, { type Express } from "express";
 import morgan from "morgan";
 import { createUser, loginUser, logout, refresh, verify } from "./auth.controller";
@@ -23,7 +23,7 @@ export const createServer = (): Express => {
       },
       credentials: true
     }))
-    .use(urlencoded({ extended: true }))
+    .use(bodyParser.urlencoded({ extended: true }))
     .use(express.json())
     .use(cookieParser())
     .post("/create-user", createUser)

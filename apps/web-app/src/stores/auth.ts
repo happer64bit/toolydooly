@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { createUserSchema, loginUserSchema } from "@toolydooly/validation-schemas/auth";
 import type z from "zod";
 import api from "@/lib/axios";
-import router from "@/router"; // ✅ Import router instance directly
+import axios from "axios";
 
 type Status = "loading" | "authenticated" | "unauthenticated";
 
@@ -13,26 +13,42 @@ export const useAuth = defineStore("auth", {
         accessToken: undefined as string | undefined,
         status: "unauthenticated" as Status,
         fetchIntervalId: undefined as ReturnType<typeof setInterval> | undefined,
+        isFetchingUser: false, // Prevents multiple concurrent fetchUser calls
     }),
     actions: {
+        async handleAuthError() {
+            console.error("Authentication failed. Logging out and redirecting.");
+        },
+
+        async handleAuthSuccess(token: string, onSuccess?: (user: UserSession) => void) {
+            this.accessToken = token;
+            localStorage.setItem("token", token);
+            await this.fetchUser(onSuccess);
+        },
+
         async login(props: z.infer<typeof loginUserSchema>, onSuccess?: (user: UserSession) => void) {
             this.status = "loading";
             try {
                 const parsed = loginUserSchema.parse(props);
                 const { data } = await api.post("/auth/login", parsed);
-                if (!data.access_token) throw new Error("Login Failed");
 
-                this.accessToken = data.access_token;
-                localStorage.setItem("token", data.access_token);
+                if (data.status !== "success") {
+                    // Throw the server's message
+                    throw new Error(data.message || "Login Failed");
+                }
 
-                const user = await this.fetchUser(onSuccess, async () => {
-                    await router.push("/auth/login");
-                });
-                this.startAutoFetch();
-                return user;
+                if (!data.access_token) {
+                    throw new Error("No access token returned");
+                }
+
+                await this.handleAuthSuccess(data.access_token, onSuccess);
+                return this.user;
             } catch (err) {
-                console.error(err);
-                this.status = "unauthenticated";
+                if(axios.isAxiosError(err)) {
+                    const msg = err?.response?.data?.message || err.message || "Login failed";
+                    throw new Error(msg);
+                }
+                throw err;
             }
         },
 
@@ -41,85 +57,81 @@ export const useAuth = defineStore("auth", {
             try {
                 const parsed = createUserSchema.parse(props);
                 const { data } = await api.post("/auth/create-user", parsed);
+
                 if (!data.access_token) throw new Error("Create User Failed");
 
-                this.accessToken = data.access_token;
-                localStorage.setItem("token", data.access_token);
+                await this.handleAuthSuccess(data.access_token, onSuccess);
 
-                const user = await this.fetchUser(onSuccess, async () => {
-                    await router.push("/auth/login");
-                });
-                this.startAutoFetch();
-                return user;
+                return this.user;
             } catch (err) {
-                console.error(err);
-                this.status = "unauthenticated";
+                if(axios.isAxiosError(err)) {
+                    const msg = err?.response?.data?.message || err.message || "Login failed";
+                    throw new Error(msg);
+                }
+                throw err;
             }
         },
 
-        async fetchUser(
-            onSuccess?: (user: UserSession) => void,
-            onSessionNotFound?: () => Promise<void>
-        ): Promise<UserSession | undefined> {
-            if (!this.accessToken) {
-                this.status = "unauthenticated";
+        async fetchUser(onSuccess?: (user: UserSession) => void): Promise<UserSession | undefined> {
+            if (this.isFetchingUser || !this.accessToken) {
+                if (!this.accessToken) {
+                    await this.handleAuthError();
+                }
                 return;
             }
+
+            this.isFetchingUser = true;
             try {
-                const { data } = await api.get("/auth/session");
+                const { data } = await api.get("/auth/session", {
+                    headers: {
+                        "Authorization": `Bearer ${this.accessToken}`
+                    }
+                });
                 this.user = data;
                 this.status = "authenticated";
                 if (onSuccess) onSuccess(data);
+                this.startAutoFetch();
                 return data;
             } catch (err) {
-                console.error(err);
-                this.logout(async () => {
-                    if (onSessionNotFound) {
-                        await onSessionNotFound();
-                    } else {
-                        await router.push("/auth/login");
-                    }
-                });
+                console.error("Failed to fetch user session:", err);
+                await this.handleAuthError();
+            } finally {
+                this.isFetchingUser = false;
             }
         },
 
         async refresh() {
             try {
-                const { data } = await api.get("/auth/refresh", {
-                    withCredentials: true,
-                });
+                const { data } = await api.get("/auth/refresh", { withCredentials: true });
 
-                if (!data.access_token) return false;
+                if (!data.access_token) {
+                    throw new Error("Refresh token failed");
+                }
+
                 this.accessToken = data.access_token;
                 localStorage.setItem("token", data.access_token);
                 return true;
             } catch (err) {
-                console.error("Failed to refresh token", err);
-                this.logout(async () => {
-                    await router.push("/auth/login");
-                });
+                console.error("Failed to refresh token:", err);
+                await this.handleAuthError();
                 return false;
             }
         },
 
         async logout(onSuccess?: () => void) {
-            if (this.status === "authenticated") {
+            if (this.status !== "unauthenticated") {
                 try {
                     await api.get("/auth/logout");
-
-                    this.user = null;
-                    this.accessToken = undefined;
-                    this.status = "unauthenticated";
-                    localStorage.removeItem("token");
-
-                    this.stopAutoFetch();
-
-                    if(onSuccess) onSuccess();
-                    return;
-                } catch {
-                    return;
+                } catch (err) {
+                    console.error("Logout request failed:", err);
                 }
             }
+            this.user = null;
+            this.accessToken = undefined;
+            this.status = "unauthenticated";
+            localStorage.removeItem("token");
+            this.stopAutoFetch();
+            if (onSuccess) onSuccess();
         },
 
         async checkAuth(onSuccess?: (user: UserSession) => void) {
@@ -127,7 +139,6 @@ export const useAuth = defineStore("auth", {
             if (token) {
                 this.accessToken = token;
                 await this.fetchUser(onSuccess);
-                this.startAutoFetch();
             } else {
                 this.status = "unauthenticated";
             }

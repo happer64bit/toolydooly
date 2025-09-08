@@ -1,6 +1,10 @@
 import { readFileSync } from "fs";
-import { join } from "path";
+import { dirname, join } from "path";
 import jwt from "jsonwebtoken";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const privateKey = readFileSync(join(__dirname, "./../../../../keys/private.key"));
 const publicKey = readFileSync(join(__dirname, "./../../../../keys/public.key"));
