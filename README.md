@@ -22,6 +22,9 @@ A **Todo application** built with **NestJS**, **Express**, **Vue**, and **MongoD
 - **auth_service** → Authentication + Redis session store  
 - **todo_service** → Todo CRUD with MongoDB + RabbitMQ queue  
 - **web-app** → Vue frontend  
+
+### Others
+
 - **auth_db** → Postgres for auth service  
 - **todo_db** → MongoDB for todos  
 - **redis** → Caching/session storage  
