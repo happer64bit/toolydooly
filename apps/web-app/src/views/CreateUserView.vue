@@ -99,7 +99,7 @@ const form = useForm({
                         <template v-slot="{ canSubmit, isSubmitting }">
                             <button type="submit" :disabled="isSubmitting || !canSubmit"
                                 class="w-full bg-teal-600 text-white py-3 rounded-full cursor-pointer hover:bg-teal-700 active:bg-teal-800 transition duration-100 mt-4">
-                                Login
+                                Create User
                             </button>
                         </template>
                     </form.Subscribe>
