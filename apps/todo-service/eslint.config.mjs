@@ -1,10 +1,14 @@
 // @ts-check
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import { defineConfig } from 'eslint/config';
+import eslint from '@eslint/js';
 
-export default tseslint.config(
+export default defineConfig(
+  eslint.configs.recommended,
+  tseslint.configs.recommended,
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: ['eslint.config.mjs', 'node_modules'],
   },
   {
     languageOptions: {

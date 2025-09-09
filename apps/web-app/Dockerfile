@@ -38,4 +38,4 @@ RUN bun i -g serve
 
 EXPOSE 4173
 
-CMD ["serve", "-s", "/apps/web-app/dist", "-p", "4173"]
+CMD ["serve", "-s", "/app/apps/web-app/dist", "-p", "4173"]

@@ -13,7 +13,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         transport: Transport.RMQ,
         options: {
           urls: [process.env.QUEUE_URL as string],
-          queue: "todo_queue",
+          queue: "app_queue",
           queueOptions: {
             durable: false
           }

@@ -1,30 +1,22 @@
-import { Type } from 'class-transformer';
-import { IsDate, IsEnum, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsNumber, IsString, IsUUID } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateTodoDto {
     @IsString()
     text: string;
 
-    @IsString()
-    @IsOptional()
-    body?: string
-
     @IsNumber()
     priority: 1 | 2 | 3;
-
-    @IsDate()
-    @Type(() => Date)
-    @IsOptional()
-    deadline?: Date
-
-    @IsDate()
-    @Type(() => Date)
-    @IsOptional()
-    remind_at?: Date
 }
 
-export class UpdateTodoDto extends PartialType(CreateTodoDto) {}
+export class UpdateTodoDto extends PartialType(CreateTodoDto) {
+    @IsString()
+    id: string    
+}
+
+export class UpdateTodoQueueDto extends UpdateTodoDto {
+    user_id: string
+}
 
 export class CreateTodoQueueDto extends CreateTodoDto {
     @IsUUID()
@@ -37,6 +29,16 @@ export class ToggleTodoDTO {
 }
 
 export class ToggleTodoQueuePayloadDto extends ToggleTodoDTO {
+    @IsString()
+    user_id: string
+}
+
+export class DeleteTodoDto {
+    @IsString()
+    id: string
+}
+
+export class DeleteTodoQueueDto extends DeleteTodoDto {
     @IsString()
     user_id: string
 }
