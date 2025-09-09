@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useTodoQuery } from '@/composables/useTodoQuery';
 import { useFilter } from '@/stores/filter';
 import { MagnifyingGlassIcon } from '@radix-icons/vue'
 import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'radix-vue';
@@ -6,10 +7,14 @@ import { SwitchRoot, SwitchThumb } from 'radix-vue'
 import { computed } from 'vue';
 
 const filter = useFilter()
+const { todoQuery } = useTodoQuery();
 
 const hideCompleted = computed({
-  get: () => filter.hideCompleted,
-  set: (value: boolean) => filter.setHideCompleted(value),
+    get: () => filter.hideCompleted,
+    set: (value: boolean) => {
+        filter.setHideCompleted(value)
+        todoQuery.refetch();
+    },
 });
 </script>
 
@@ -21,7 +26,9 @@ const hideCompleted = computed({
             <span class="ml-2">Filter Todo</span>
         </PopoverTrigger>
         <PopoverPortal>
-            <PopoverContent class="border border-black/5 shadow-sm px-4 py-2 bg-white rounded-lg min-w-[250px] pointer-events-auto z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2" align="end" :side-offset="10">
+            <PopoverContent
+                class="border border-black/5 shadow-sm px-4 py-2 bg-white rounded-lg min-w-[250px] pointer-events-auto z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+                align="start" :side-offset="10">
                 <div class="flex gap-2 items-center justify-between">
                     <label class="text-[15px] leading-none pr-[15px] select-none" for="hide-completed">
                         Hide Completed

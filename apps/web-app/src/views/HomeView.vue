@@ -1,147 +1,39 @@
 <script setup lang="ts">
 import BottomChatContainer from '@/components/BottomChatContainer.vue'
 import FilterTodo from '@/components/FilterTodo.vue'
+import TodoList from '@/components/TodoList.vue'
+import TodoControls from '@/components/TodoControl.vue'
 import { useAuth } from '@/stores/auth'
-import { useFilter } from '@/stores/filter'
-import { useTodo } from '@/stores/todo'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useTodoQuery } from '@/composables/useTodoQuery'
+import { ReloadIcon } from '@radix-icons/vue'
 
-// stores
 const auth = useAuth()
-const todo = useTodo()
-const filter = useFilter()
-const router = useRouter();
-
-// infer todo type from store
-type Todo = Awaited<ReturnType<typeof todo.fetchTodo>>[number]
-
-// query
-const queryClient = useQueryClient();
-
-const todoQuery = useQuery<Todo[]>({
-    queryKey: ['todos'],
-    queryFn: () => todo.fetchTodo({
-        limit: 10,
-        hideCompleted: filter.hideCompleted
-    }),
-    refetchOnWindowFocus: false,
-})
-
-watch(
-    () => filter.hideCompleted,
-    () => {
-        todoQuery.refetch()
-    }
-)
-
-// toggle mutation
-const toggleMutation = useMutation({
-    mutationFn: (id: string) => todo.toggleTodo(id),
-    onMutate: async (id: string) => {
-        await queryClient.cancelQueries({ queryKey: ['todos'] })
-
-        const previousTodos = queryClient.getQueryData<Todo[]>(['todos']) ?? []
-
-        queryClient.setQueryData<Todo[]>(['todos'], old =>
-            old?.map(t =>
-                t._id === id
-                    ? { ...t, is_done: !t.is_done, done_at: !t.is_done ? new Date() : undefined }
-                    : t
-            ) ?? []
-        )
-
-        return { previousTodos }
-    },
-    onError: (_err, _id, context) => {
-        if (context?.previousTodos) {
-            queryClient.setQueryData(['todos'], context.previousTodos)
-        }
-    },
-    onSettled: () => {
-        todoQuery.refetch()
-    },
-})
-
-
-// create mutation
-const createTodoMutation = useMutation({
-    mutationKey: ['createTodo'],
-    mutationFn: (data: Parameters<typeof todo.createTodo>[0]) => todo.createTodo(data),
-    onSuccess: () => {
-        todoQuery.refetch()
-    },
-})
+const { todoQuery } = useTodoQuery();
 </script>
 
 <template>
-    <div class="container mx-auto text-gray-900 min-h-screen py-4">
-        <div class="flex items-center justify-between">
-            <h1 class="text-xl font-bold">ToolyDooly</h1>
-            <RouterLink to="/auth/sign-in" class="bg-black px-4 py-2 rounded-full text-white"
-                v-if="auth.status == 'unauthenticated' || auth.status == 'loading'">
-                Sign In
+    <div class="container mx-auto min-h-screen flex flex-col text-gray-900">
+        <header class="flex items-center justify-between sticky top-0 py-4 bg-gray-50 z-10">
+            <RouterLink to="/">
+                <h1 class="text-2xl font-bold">ToolyDooly</h1>
             </RouterLink>
-            <button to="/auth/logout" class="bg-black px-4 py-2 rounded-full text-white hover:opacity-90 cursor-pointer"
-                v-if="auth.status == 'authenticated'" @click="auth.logout(async () => {
-                    await router.push('/auth/sign-in');
-                })">
-                Logout
-            </button>
-        </div>
+            <TodoControls :auth="auth" />
+        </header>
 
-        <div class="pt-6">
-            <div class="flex justify-end mb-2">
+        <main class="flex-1 pt-6">
+            <div class="flex justify-between items-center mb-4">
                 <FilterTodo />
+                <button @click="todoQuery.refetch()"
+                    class="text-blue-500 flex items-center gap-1 hover:bg-black/5 px-4 py-1.5 rounded-lg cursor-pointer">
+                    <ReloadIcon :class="todoQuery.isFetching.value ? 'animate-spin' : ''" />
+                    <span class="ml-2">Refresh</span>
+                </button>
             </div>
-            <TransitionGroup name="list" tag="div">
-                <label v-for="todoItem in todoQuery.data.value" :key="todoItem._id"
-                    class="flex items-center justify-between cursor-pointer p-4 rounded-lg hover:bg-gray-100 transition-transform duration-100 active:scale-[0.98] select-none">
-                    <div class="flex items-center gap-4">
-                        <span :class="`w-1.5 h-10 rounded ${todoItem.priority === 3
-                            ? 'bg-green-500'
-                            : todoItem.priority === 2
-                                ? 'bg-blue-600'
-                                : todoItem.priority === 1
-                                    ? 'bg-red-600'
-                                    : ''
-                            }`" />
-                        <div class="flex flex-col">
-                            <span :class="`text-lg font-medium ${todoItem.is_done && 'line-through opacity-80'}`">
-                                {{ todoItem.text }}
-                            </span>
-                            <span class="text-sm text-gray-500">
-                                {{ new Date(todoItem.updated_at).toLocaleString() }}
-                            </span>
-                        </div>
-                    </div>
+            <TodoList />
+        </main>
 
-                    <input type="checkbox" class="w-6 h-6 border-gray-900 rounded bg-black checked:bg-gray-200"
-                        :checked="todoItem.is_done" @change="() => toggleMutation.mutate(todoItem._id)" />
-                </label>
-            </TransitionGroup>
-        </div>
-    </div>
-
-    <div class="sticky bottom-0 left-0 w-full flex justify-center p-4 shadow-md bg-gray-50">
-        <BottomChatContainer @submit="data => createTodoMutation.mutate(data)" />
+        <footer class="sticky bottom-0 left-0 w-full flex justify-center p-4 bg-gray-50">
+            <BottomChatContainer />
+        </footer>
     </div>
 </template>
-
-<style scoped>
-.list-enter-active,
-.list-leave-active {
-    transition: all 0.3s ease;
-}
-
-.list-enter-from {
-    opacity: 0;
-    transform: translateY(10px);
-}
-
-.list-leave-to {
-    opacity: 0;
-    transform: translateY(-10px);
-}
-</style>
