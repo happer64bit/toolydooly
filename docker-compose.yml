@@ -18,8 +18,8 @@ services:
       context: .
       dockerfile: ./apps/auth-service/Dockerfile
     restart: always
-    ports:
-      - "3002:3002"
+    networks:
+      - app_network
     environment:
       - REDIS_HOST=redis
       - REDIS_PASSWORD=redis
@@ -28,26 +28,23 @@ services:
     depends_on:
       - auth_db
       - redis
-    networks:
-      - app_network
     volumes:
       - ./keys:/app/keys
 
-  redis:
-    container_name: redis
-    image: redis:7
-    restart: always
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
+  todo-service:
+    container_name: todo_service
+    build:
+      context: .
+      dockerfile: ./apps/todo-service/Dockerfile
     networks:
       - app_network
-    command: >
-      redis-server
-      --requirepass redis
-      --appendonly yes
-      --protected-mode no
+    environment:
+      - TODO_DATABASE_URL=mongodb://todo_user:todo_pass@todo_db:27017/todo_db?authSource=admin
+      - NODE_ENV=production
+      - QUEUE_URL=amqp://rabbitmq:rabbitmq@rabbitmq:5672
+    depends_on:
+      - todo_db
+      - rabbitmq
 
   web-app:
     container_name: web-app
@@ -62,54 +59,43 @@ services:
   auth_db:
     image: postgres:latest
     container_name: auth_db
-    restart: always
     environment:
       POSTGRES_USER: auth_user
       POSTGRES_PASSWORD: auth_pass
       POSTGRES_DB: auth_db
-    ports:
-      - "5433:5432"
     volumes:
       - auth_db_data:/var/lib/postgresql/data
     networks:
       - app_network
 
-  todo-service:
-    container_name: todo_service
-    build:
-      context: .
-      dockerfile: ./apps/todo-service/Dockerfile
-    ports:
-      - "3003:3003"
-    networks:
-      - app_network
-    environment:
-      - TODO_DATABASE_URL=mongodb://todo_user:todo_pass@todo_db:27017/todo_db?authSource=admin
-      - NODE_ENV=production
-      - QUEUE_URL=amqp://rabbitmq:rabbitmq@rabbitmq:5672
-
   todo_db:
     image: mongo:latest
     container_name: todo_db
-    restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: todo_user
       MONGO_INITDB_ROOT_PASSWORD: todo_pass
       MONGO_INITDB_DATABASE: todo_db
-    ports:
-      - "27017:27017"
     volumes:
       - todo_db_data:/data/db
     networks:
       - app_network
 
+  redis:
+    image: redis:7
+    container_name: redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - app_network
+    command: >
+      redis-server
+      --requirepass redis
+      --appendonly yes
+      --protected-mode no
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
-    restart: always
-    ports:
-      - "5672:5672"
-      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: rabbitmq
       RABBITMQ_DEFAULT_PASS: rabbitmq

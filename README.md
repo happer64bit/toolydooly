@@ -46,6 +46,11 @@ bun install
 bun dev
 ```
 
+#### Starting Docker Services For Development
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up auth_db todo_db redis rabbitmq -d
+```
+
 ### Run with Docker Compose  
 ```bash
 docker-compose up --build

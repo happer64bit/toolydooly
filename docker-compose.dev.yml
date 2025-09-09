@@ -1,0 +1,17 @@
+services:
+  auth_db:
+    ports:
+      - "5433:5432"
+
+  todo_db:
+    ports:
+      - "27017:27017"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    ports:
+      - "5672:5672"
+      - "15672:15672"
