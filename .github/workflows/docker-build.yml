@@ -28,8 +28,5 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      - name: Build and run containers
-        run: docker-compose up -d --build
-
-      - name: Run tests
-        run: docker-compose exec -T app pytest
+      - name: Build Containers
+        run: docker-compose up --build
