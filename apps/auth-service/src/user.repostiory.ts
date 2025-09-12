@@ -1,5 +1,6 @@
 import knex from 'knex';
 import config from './knexfile';
+import { User } from 'knex/types/tables';
 const db = knex(config);
 
 export const findUserByIdentifier = (identifier: string) => db("users").where("email", identifier).where("is_active", true).orWhere("username", identifier).first();
@@ -7,9 +8,4 @@ export const findUserByIdentifier = (identifier: string) => db("users").where("e
 export const findUserById = (uid: string) =>
     db("users").where("uid", uid).where("is_active", true).first();
 
-export const upsertUserInDb = (user: { username: string; email: string; password: string }) =>
-    db("users")
-        .insert(user)
-        .onConflict(["email", "username"])
-        .merge()
-        .returning("*");
+export const createUser = (user: User) => db("users").insert(user).returning("*");
