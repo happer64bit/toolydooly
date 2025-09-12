@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { TrashIcon } from '@radix-icons/vue'
 import { useTodoQuery } from '@/composables/useTodoQuery'
-import { defineProps } from 'vue'
 import type { Todo } from '@/types/todo.type';
 
 const props = defineProps<{ todo: Todo }>()

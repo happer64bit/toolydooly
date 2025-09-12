@@ -2,7 +2,6 @@
 import { CaretDownIcon, ExitIcon } from '@radix-icons/vue'
 import { DropdownMenuRoot, DropdownMenuTrigger, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from 'radix-vue'
 import router from '@/router'
-import { defineProps } from 'vue'
 import type { useAuth } from '@/stores/auth';
 
 const props = defineProps<{ auth: ReturnType<typeof useAuth> }>()
@@ -23,8 +22,8 @@ const props = defineProps<{ auth: ReturnType<typeof useAuth> }>()
                 <DropdownMenuContent
                     align="end"
                     class="bg-white border border-black/10 rounded-xl p-2 min-w-[180px] space-y-1 mt-4
-                data-[state=open]:animate-in data-[state=open]:fade-in-85 data-[state=open]:slide-in-from-top-2 data-[state=open]:zoom-in-90
-                data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-85 duration-200">
+                    data-[state=open]:animate-in data-[state=open]:fade-in-85 data-[state=open]:slide-in-from-top-2 data-[state=open]:zoom-in-90
+                    data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-85 duration-200">
                     <p class="text-sm text-gray-500 line-clamp-1 px-2 my-1">Hello @{{ props.auth.user?.username }}</p>
                     <DropdownMenuSeparator class="h-[1px] bg-black/5" />
                     <DropdownMenuItem @click="props.auth.logout(async () => await router.push('/auth/sign-in'))"
