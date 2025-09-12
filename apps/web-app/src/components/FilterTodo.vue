@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTodoQuery } from '@/composables/useTodoQuery';
 import { useFilter } from '@/stores/filter';
-import { MagnifyingGlassIcon } from '@radix-icons/vue'
+import { CaretSortIcon } from '@radix-icons/vue'
 import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'radix-vue';
 import { SwitchRoot, SwitchThumb } from 'radix-vue'
 import { computed } from 'vue';
@@ -22,14 +22,14 @@ const hideCompleted = computed({
     <PopoverRoot>
         <PopoverTrigger
             class="text-blue-500 flex items-center gap-1 hover:bg-black/5 px-4 py-1.5 rounded-lg cursor-pointer">
-            <MagnifyingGlassIcon />
+            <CaretSortIcon />
             <span class="ml-2">Filter Todo</span>
         </PopoverTrigger>
         <PopoverPortal>
             <PopoverContent
-                class="border border-black/5 shadow-sm px-4 py-2 bg-white rounded-lg min-w-[250px] pointer-events-auto z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+                class="border border-black/5 shadow-sm px-4 bg-white rounded-lg min-w-[250px] pointer-events-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 space-y-3 z-40"
                 align="start" :side-offset="10">
-                <div class="flex gap-2 items-center justify-between">
+                <div class="flex gap-2 items-center justify-between py-2">
                     <label class="text-[15px] leading-none pr-[15px] select-none" for="hide-completed">
                         Hide Completed
                     </label>
