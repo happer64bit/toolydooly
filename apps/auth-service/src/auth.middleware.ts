@@ -54,10 +54,10 @@ export default async function AuthMiddleware(
     }, 60 * 15);
 
     req.user = {
-      uid: user.uid,
+      uid: user.uid!,
       email: user.email,
       username: user.username,
-      created_at: user.created_at
+      created_at: user.created_at!
     };
 
     next();

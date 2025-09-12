@@ -8,25 +8,26 @@ export const registerUser = async (username: string, email: string, password: st
     if (existing) throw new Error(existing.email === email ? "Email exists" : "Username exists");
 
     const hashedPassword = await hash(password, 12);
-    const [user] = await userRepo.upsertUserInDb({ username, email, password: hashedPassword });
+    const [user] = await userRepo.createUser({ username, email, password: hashedPassword });
 
     await cache.setCache(email, { uid: user.uid, username: user.username, email: user.email });
 
-    const accessToken = signAccessToken(user.uid);
-    const refreshToken = signRefreshToken(user.uid);
+    const accessToken = signAccessToken(user.uid!);
+    const refreshToken = signRefreshToken(user.uid!);
     return { user, accessToken, refreshToken };
 };
 
 export const loginUser = async (identifier: string, password: string) => {
     const user = await userRepo.findUserByIdentifier(identifier);
-    if (!user || !(await compare(password, user.password))) throw new Error("Invalid credentials");
+    if (!user) throw new Error("User not found");
+    if(!(await compare(password, user.password))) throw new Error("Password Mismatch")
 
     await cache.setCache(identifier, { uid: user.uid, username: user.username, email: user.email });
 
     return {
         user: { uid: user.uid, username: user.username, email: user.email },
-        accessToken: signAccessToken(user.uid),
-        refreshToken: signRefreshToken(user.uid)
+        accessToken: signAccessToken(user.uid!),
+        refreshToken: signRefreshToken(user.uid!)
     };
 };
 

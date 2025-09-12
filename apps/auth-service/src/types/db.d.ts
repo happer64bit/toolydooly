@@ -2,12 +2,12 @@ import 'knex';
 
 declare module 'knex/types/tables' {
     export interface User {
-        uid: string;
+        uid?: string;
         username: string;
         email: string;
         password: string;
-        is_active: boolean;
-        created_at: Date;
+        is_active?: boolean;
+        created_at?: Date;
     }
 
     interface Tables {
