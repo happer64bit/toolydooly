@@ -43,7 +43,7 @@ export class TodoController {
             const result = await lastValueFrom(this.rabbitClient.send({ cmd: 'todo.create' }, payload));
             if (result?.error) throw new HttpException(result.error, result.status);
             return result;
-        } catch (err: any) {
+        } catch (err) {
             throw new HttpException(`Failed to create todo: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -51,18 +51,23 @@ export class TodoController {
     @Get()
     @UseGuards(AuthGuard)
     async listTodos(
-        @Query('limit') limit = '10',
         @Query('hide_completed') hideCompleted: 'false' | 'true' = 'false',
+        @Query('query') query: string | undefined,
         @User() user: IUser,
     ) {
-        const limitNum = parseInt(limit, 10) || 10;
         const hideCompletedBool = hideCompleted === 'true';
+
         try {
-            return await this.todoService.getTodos(limitNum, hideCompletedBool, user.uid);
+            return await this.todoService.getTodos(
+                hideCompletedBool,
+                user.uid,
+                query
+            );
         } catch (err: any) {
             throw new HttpException(`Failed to fetch todos: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @Put('toggle')
     @UseGuards(AuthGuard)
@@ -92,7 +97,7 @@ export class TodoController {
 
             if (result?.error) throw new HttpException(result.error, result.status);
             return { success: true };
-        } catch (err: any) {
+        } catch (err) {
             throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

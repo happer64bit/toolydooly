@@ -2,11 +2,8 @@ import * as mongoose from 'mongoose';
 
 export interface Todo {
   text: string;
-  body?: string;
   is_done: boolean;
   done_at?: Date;
-  deadline?: Date;
-  remind_at?: Date;
   user_id: string;
   priority: 1 | 2 | 3;
   is_deleted: boolean;
@@ -19,7 +16,8 @@ export const TodoSchema = new mongoose.Schema<Todo>({
     type: String,
     required: true,
     maxlength: 1000,
-    trim: true
+    trim: true,
+    index: true
   },
   is_done: {
     type: Boolean,

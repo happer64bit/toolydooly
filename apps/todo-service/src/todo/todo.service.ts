@@ -5,20 +5,30 @@ import { CreateTodoQueueDto, UpdateTodoQueueDto } from './todo.dto';
 
 @Injectable()
 export class TodoService {
-  constructor(@Inject('TODO_MODEL') private readonly todoModel: Model<Todo>) {}
+  constructor(@Inject('TODO_MODEL') private readonly todoModel: Model<Todo>) { }
 
   async createTodo(body: CreateTodoQueueDto): Promise<Todo> {
     return this.todoModel.create(body);
   }
 
-  async getTodos(limit = 10, hideCompleted = false, user_id: string): Promise<Todo[]> {
+  async getTodos(
+    hideCompleted = false,
+    user_id: string,
+    search_query?: string
+  ): Promise<Todo[]> {
     const query: Record<string, any> = { is_deleted: false, user_id };
-    if (hideCompleted) query.is_done = false;
 
+    if (hideCompleted) query.is_done = false;
+    if (search_query) {
+      query.$or = [
+        { $text: { $search: search_query } },
+        { text: { $regex: search_query, $options: 'i' } }
+      ];
+    }
+    
     return this.todoModel
       .find(query)
       .sort({ is_done: 1, priorityOrder: -1, updated_at: -1 })
-      .limit(limit)
       .exec();
   }
 

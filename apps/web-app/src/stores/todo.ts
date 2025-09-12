@@ -5,16 +5,28 @@ import { useAuth } from "./auth";
 
 export const useTodo = defineStore("todo", {
     actions: {
-        async fetchTodo({ limit, hideCompleted }: { limit: number; hideCompleted: boolean }): Promise<Todo[]> {
-            const auth = useAuth();
+        async fetchTodo({
+            limit,
+            hideCompleted,
+            query
+        }: {
+            limit: number
+            hideCompleted: boolean
+            query?: string
+        }): Promise<Todo[]> {
+            const auth = useAuth()
             try {
-                const { data } = await api.get(`/todo?limit=${limit}&hide_completed=${hideCompleted}`, {
-                    headers: { Authorization: `Bearer ${auth.accessToken}` },
-                });
-                return data;
+                const searchParam = query ? `&query=${encodeURIComponent(query)}` : ''
+                const { data } = await api.get(
+                    `/todo?limit=${limit}&hide_completed=${hideCompleted}${searchParam}`,
+                    {
+                        headers: { Authorization: `Bearer ${auth.accessToken}` }
+                    }
+                )
+                return data
             } catch (err) {
-                console.error("Fetching Todo Failed", err);
-                throw err;
+                console.error('Fetching Todo Failed', err)
+                throw err
             }
         },
 
@@ -38,8 +50,14 @@ export const useTodo = defineStore("todo", {
 
             if (!priorityInt || !body.text) throw new Error("Canceling Todo Creation");
 
+            const { accessToken } = useAuth();
+
             try {
-                const { data } = await api.post("/todo", { text: body.text, priority: priorityInt });
+                const { data } = await api.post("/todo", { text: body.text, priority: priorityInt }, {
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`
+                    }
+                });
                 return data;
             } catch {
                 throw new Error("Failed To Create Todo");
