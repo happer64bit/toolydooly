@@ -10,7 +10,7 @@ export function useTodoQuery() {
 
     const todoQuery = useQuery({
         queryKey: ['todos', filter.hideCompleted],
-        queryFn: () => todo.fetchTodo({ limit: 10, hideCompleted: filter.hideCompleted }),
+        queryFn: () => todo.fetchTodo({ limit: 10, hideCompleted: filter.hideCompleted, query: filter.searchQuery }),
         refetchOnWindowFocus: false,
     })
 
