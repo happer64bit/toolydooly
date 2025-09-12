@@ -37,7 +37,7 @@ const priorities: Priority[] = ['low', 'medium', 'high']
 </script>
 
 <template>
-    <form class="container rounded-full border border-neutral-300 shadow-sm flex items-center gap-2" @submit="onSubmit">
+    <form class="container rounded-full border bg-white border-neutral-300 shadow-sm flex items-center gap-2" @submit="onSubmit">
         <PopoverRoot>
             <PopoverTrigger class="rounded-full flex items-center justify-center hover:bg-black/5 min-h-10 min-w-10"
                 aria-label="Priority Settings">
