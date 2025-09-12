@@ -22,7 +22,7 @@ api.interceptors.response.use(
                     return api(originalRequest);
                 }
             }
-            authStore.logout();
+            // authStore.logout();
         }
         return Promise.reject(err);
     }
@@ -39,8 +39,6 @@ api.interceptors.response.use(
             if (refreshed) {
                 originalRequest.headers.Authorization = `Bearer ${authStore.accessToken}`;
                 return api(originalRequest);
-            } else {
-                authStore.logout();
             }
         }
         return Promise.reject(err);
