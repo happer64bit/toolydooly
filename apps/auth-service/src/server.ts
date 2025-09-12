@@ -30,6 +30,6 @@ export const createServer = (): Express => {
     .post("/login", loginUser)
     .get("/session", AuthMiddleware, verify)
     .get("/refresh", refresh)
-    .get("/logout", AuthMiddleware, logout)
+    .get("/logout", logout)
   return app;
 };
