@@ -1,5 +1,5 @@
 import { generateKeyPairSync } from "crypto";
-import { writeFileSync } from "fs";
+import { writeFileSync, existsSync, mkdirSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
@@ -18,6 +18,10 @@ function generateRS512Keys() {
 }
 
 const keys = generateRS512Keys();
+
+if(!existsSync(join(__dirname, "../keys"))) {
+  mkdirSync(join(__dirname, "../keys"));
+}
 
 writeFileSync(join(__dirname, "../keys/public.key"), keys.publicKey);
 writeFileSync(join(__dirname, "../keys/private.key"), keys.privateKey);
