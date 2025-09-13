@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile
-    restart: always
+    restart: no
     ports:
       - "3001:3001"
     networks:
@@ -17,7 +17,7 @@ services:
     build:
       context: .
       dockerfile: ./apps/auth-service/Dockerfile
-    restart: always
+    restart: no
     networks:
       - app_network
     environment:
@@ -29,7 +29,7 @@ services:
       - auth_db
       - redis
     volumes:
-      - ./keys:/app/keys
+      - ./keys:/app/keys:z
 
   todo-service:
     container_name: todo_service
@@ -63,6 +63,8 @@ services:
       POSTGRES_USER: auth_user
       POSTGRES_PASSWORD: auth_pass
       POSTGRES_DB: auth_db
+    ports:
+      - "5433:5432"
     volumes:
       - auth_db_data:/var/lib/postgresql/data
     networks:
@@ -75,6 +77,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: todo_user
       MONGO_INITDB_ROOT_PASSWORD: todo_pass
       MONGO_INITDB_DATABASE: todo_db
+    ports:
+      - "27017:27017"
     volumes:
       - todo_db_data:/data/db
     networks:
@@ -85,6 +89,8 @@ services:
     container_name: redis
     volumes:
       - redis_data:/data
+    ports:
+      - "6379:6379"
     networks:
       - app_network
     command: >
@@ -99,6 +105,9 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: rabbitmq
       RABBITMQ_DEFAULT_PASS: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
