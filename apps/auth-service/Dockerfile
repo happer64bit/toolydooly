@@ -1,42 +1,48 @@
+# Use a base image with Bun pre-installed
 FROM oven/bun:1 AS base
 
-# The web Dockerfile is copy-pasted into our main docs at /docs/handbook/deploying-with-docker.
-# Make sure you update this Dockerfile, the Dockerfile in the web workspace and copy that over to Dockerfile in the docs.
-
+# Builder stage for installing dependencies and preparing the app
 FROM base AS builder
-
 WORKDIR /app
 
-RUN bun add turbo --global
+# Install Turbo and add it as a dev dependency
+RUN bun add turbo -D
 
+# Copy all files into the container
 COPY . .
 
-RUN turbo prune auth-service --docker
+# Ensure the /app/keys directory has restricted access (no write)
+RUN chmod a-w /app/keys
 
+# Prune the auth-service for Docker
+RUN bun turbo prune auth-service --docker
+
+# Installer stage for installing all dependencies
 FROM base AS installer
-
 WORKDIR /app
 
+# Copy the pruned output from the builder stage
 COPY --from=builder /app/out/json/ .
 RUN bun install
 
-# Build the project and its dependencies
+# Copy the full output for the app
 COPY --from=builder /app/out/full/ .
 
-# Uncomment and use build args to enable remote caching
-# ARG TURBO_TEAM
-# ENV TURBO_TEAM=$TURBO_TEAM
-
-# ARG TURBO_TOKEN
-# ENV TURBO_TOKEN=$TURBO_TOKEN
-
+# Build the app using Bun
 RUN bun turbo build
 
+# Runner stage for serving the application
 FROM base AS runner
 WORKDIR /app
 
+# Set user to root (default user is root in most base images, but explicitly set here for clarity)
+USER root
+
+# Copy everything from the installer stage (including installed dependencies and build output)
 COPY --from=installer /app .
 
+# Expose the application port
 EXPOSE 3002
 
+# Command to run the application (assuming Bun is being used to run the Node.js app)
 CMD ["node", "apps/auth-service/dist/index.js"]
