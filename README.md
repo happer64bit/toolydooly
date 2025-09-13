@@ -49,7 +49,7 @@ bun dev
 
 #### Starting Docker Services For Development
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up auth_db todo_db redis rabbitmq -d
+docker compose up auth_db todo_db redis rabbitmq -d
 ```
 
 ### Run with Docker Compose  
