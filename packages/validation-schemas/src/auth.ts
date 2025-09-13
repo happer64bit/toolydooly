@@ -11,6 +11,6 @@ export const createUserSchema = z.object({
 });
 
 export const loginUserSchema = z.object({
-  usernameOrEmail: z.string().max(255).transform((value) => value.toLowerCase()),
+  usernameOrEmail: z.string().min(3).max(255).transform((value) => value.toLowerCase()),
   password: z.string().min(8).max(255),
 });
