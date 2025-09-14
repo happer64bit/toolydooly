@@ -40,7 +40,7 @@ const groupedTodos = computed(() => {
 
   <div v-else class="space-y-6">
     <div v-for="(todos, date) in groupedTodos" :key="date">
-      <h2 class="text-lg font-semibold text-gray-700 mb-2">{{ date }}</h2>
+      <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-2">{{ date }}</h2>
       <TransitionGroup name="list" tag="div" class="space-y-2">
         <TodoItem v-for="todoItem in todos" :key="todoItem._id" :todo="todoItem" />
       </TransitionGroup>
