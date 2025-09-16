@@ -1,6 +1,6 @@
 # ToolyDooly — A Node.js Microservice  
 
-A **Todo application** built with **NestJS**, **Express**, **Vue**, and **MongoDB**, running in a Dockerized microservice architecture.  
+A **Todo application** built with **NestJS**, **Express**, **Vue**, and **MongoDB**, running in a Dockerized microservice architecture. This app is still in progress and you can see the [ROADMAP](./ROADMAP.md)
 
 *This is a verification of participation in Code2Career by the Japan-Myanmar Center, and this will be used in the portfolio of Win Khant Lin.*
 
