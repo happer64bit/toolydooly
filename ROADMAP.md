@@ -2,8 +2,8 @@
 
 ## Phase 1: Basic App
 - [x] Build a simple todo app (create, update, delete)
-- [x] Use in-memory or local storage
 - [x] Basic UI for todos
+- [x] Basic Microservice For Authentication and Todo CRUD
 
 ## Phase 2: Offline Support
 - [ ] Replace in-memory storage with **IndexedDB**
