@@ -10,7 +10,9 @@
     "dev": "tsx --watch ./src/index.ts",
     "lint": "tsc --noEmit && eslint \"src/**/*.ts*\" --max-warnings 0",
     "start": "node -r esbuild-register ./src/index.ts",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --detectOpenHandles",
+    "migrate": "knex --knexfile src/knexfile.ts migrate:latest",
+    "rollback": "knex --knexfile src/knexfile.ts migrate:rollback"
   },
   "jest": {
     "preset": "@toolydooly/jest-presets/node"

@@ -10,7 +10,8 @@
     "dev:frontend": "dotenv -- turbo run dev --filter='web-app'",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
-    "test": "dotenv -- turbo run test"
+    "test": "dotenv -- turbo run test",
+    "migrate:auth": "dotenv -- npm --prefix apps/auth-service run migrate"
   },
   "dependencies": {
     "dotenv-cli": "^10.0.0",
