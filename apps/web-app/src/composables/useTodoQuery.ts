@@ -10,41 +10,50 @@ export function useTodoQuery() {
 
     const todoQuery = useQuery({
         queryKey: ['todos', filter.hideCompleted],
-        queryFn: () => todo.fetchTodo({ limit: 10, hideCompleted: filter.hideCompleted, query: filter.searchQuery }),
+        queryFn: () => todo.fetchTodo({ hideCompleted: filter.hideCompleted, query: filter.searchQuery }),
         refetchOnWindowFocus: false,
+        refetchInterval: 15000
     })
 
     const toggleMutation = useMutation({
         mutationFn: (id: string) => todo.toggleTodo(id),
-        onMutate: async (id: string) => {
-            await queryClient.cancelQueries({ queryKey: ['todos'] })
-            const previousTodos = queryClient.getQueryData(['todos']) ?? []
-            queryClient.setQueryData<Todo[]>(['todos'], old =>
-                old?.map(t => t._id === id ? { ...t, is_done: !t.is_done, done_at: !t.is_done ? new Date() : undefined } : t) ?? []
+        onSuccess: (_res, id) => {
+            const oldTodos = queryClient.getQueryData<Todo[]>(['todos', filter.hideCompleted]) ?? []
+            const newTodos = oldTodos.map(t =>
+                t._id === id ? { ...t, is_done: !t.is_done, done_at: !t.is_done ? new Date() : undefined } : t
             )
-            return { previousTodos }
+            queryClient.setQueryData(['todos', filter.hideCompleted], newTodos)
         },
-        onError: (_err, _id, ctx) => {
-            if (ctx?.previousTodos) queryClient.setQueryData(['todos'], ctx.previousTodos)
-        },
-        onSettled: () => todoQuery.refetch(),
     })
 
     const removeMutation = useMutation({
         mutationFn: (id: string) => todo.deleteTodo(id),
-        onSuccess: () => todoQuery.refetch(),
+        onSuccess: (_res, id) => {
+            const oldTodos = queryClient.getQueryData<Todo[]>(['todos', filter.hideCompleted]) ?? []
+            queryClient.setQueryData(
+                ['todos', filter.hideCompleted],
+                oldTodos.filter(t => t._id !== id)
+            )
+        },
     })
 
     const editMutation = useMutation({
-        mutationFn: (data: { id: string, text: string }) =>
-            todo.updateTodo(data.id, { text: data.text }),
-        onSuccess: () => todoQuery.refetch(),
+        mutationFn: (data: { id: string, text: string }) => todo.updateTodo(data.id, { text: data.text }),
+        onSuccess: (updatedTodo) => {
+            const oldTodos = queryClient.getQueryData<Todo[]>(['todos', filter.hideCompleted]) ?? []
+            queryClient.setQueryData(
+                ['todos', filter.hideCompleted],
+                oldTodos.map(t => t._id === updatedTodo._id ? updatedTodo : t)
+            )
+        },
     })
 
     const createTodoMutation = useMutation({
-        mutationKey: ['createTodo'],
         mutationFn: (data: Parameters<typeof todo.createTodo>[0]) => todo.createTodo(data),
-        onSuccess: () => todoQuery.refetch(),
+        onSuccess: (createdTodo) => {
+            const oldTodos = queryClient.getQueryData<Todo[]>(['todos', filter.hideCompleted]) ?? []
+            queryClient.setQueryData(['todos', filter.hideCompleted], [...oldTodos, createdTodo])
+        },
     })
 
     return { todoQuery, toggleMutation, removeMutation, editMutation, createTodoMutation }
