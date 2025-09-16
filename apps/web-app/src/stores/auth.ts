@@ -13,7 +13,7 @@ export const useAuth = defineStore("auth", {
         accessToken: undefined as string | undefined,
         status: "unauthenticated" as Status,
         fetchIntervalId: undefined as ReturnType<typeof setInterval> | undefined,
-        isFetchingUser: false, // Prevents multiple concurrent fetchUser calls
+        isFetchingUser: false,
     }),
     actions: {
         async handleAuthError() {
@@ -33,7 +33,6 @@ export const useAuth = defineStore("auth", {
                 const { data } = await api.post("/auth/login", parsed);
 
                 if (data.status !== "success") {
-                    // Throw the server's message
                     throw new Error(data.message || "Login Failed");
                 }
 
