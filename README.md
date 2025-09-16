@@ -6,7 +6,29 @@ A **Todo application** built with **NestJS**, **Express**, **Vue**, and **MongoD
 
 ---
 
+## Generating Key Pair
+
+To generate key pair that will be used for generating Json Web Token with RS512, you may either generate key manually by yourself by running `openssl` or run the script.
+
+```sh
+node generate-keypair.mjs
+
+# Or
+
+bun generate-keypair.mjs
+```
+
 ## Requirements  
+
+### Check Prerequisite
+
+```sh
+node scripts/prerequisite.mjs
+
+# Or
+
+bun scripts/prerequisite.mjs
+```
 
 ### Deployment  
 - **Docker** (Docker Compose recommended)  
