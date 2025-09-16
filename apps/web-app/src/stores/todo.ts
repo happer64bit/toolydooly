@@ -6,11 +6,9 @@ import { useAuth } from "./auth";
 export const useTodo = defineStore("todo", {
     actions: {
         async fetchTodo({
-            limit,
             hideCompleted,
             query
         }: {
-            limit: number
             hideCompleted: boolean
             query?: string
         }): Promise<Todo[]> {
@@ -18,7 +16,7 @@ export const useTodo = defineStore("todo", {
             try {
                 const searchParam = query ? `&query=${encodeURIComponent(query)}` : ''
                 const { data } = await api.get(
-                    `/todo?limit=${limit}&hide_completed=${hideCompleted}${searchParam}`,
+                    `/todo?hide_completed=${hideCompleted}${searchParam}`,
                     {
                         headers: { Authorization: `Bearer ${auth.accessToken}` }
                     }
