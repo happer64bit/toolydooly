@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { execSync } from "child_process";
+import readline from "readline";
 
 function checkCommand(cmd) {
   try {
@@ -53,12 +54,10 @@ function checkKeys() {
     process.exit(1);
   }
 
-  // Check if keys are valid for RS512
   try {
     const privateKey = fs.readFileSync(privateKeyPath, "utf8");
     const publicKey = fs.readFileSync(publicKeyPath, "utf8");
 
-    // Try signing and verifying a dummy message
     const message = "test";
     const signature = crypto.sign("RSA-SHA512", Buffer.from(message), privateKey);
     const verified = crypto.verify("RSA-SHA512", Buffer.from(message), publicKey, signature);
@@ -72,7 +71,33 @@ function checkKeys() {
   }
 }
 
+function promptMigrations() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  rl.question("Do you want to run database migrations? (y/N): ", (answer) => {
+    const normalized = answer.trim().toLowerCase();
+    if (normalized === "y") {
+      try {
+        console.log("Running migrations...");
+        execSync("bun run migrate:auth", { stdio: "inherit" });
+        console.log("Migrations completed.");
+      } catch (err) {
+        console.error("Error running migrations:", err.message);
+        process.exit(1);
+      }
+    } else {
+      console.log("Skipping migrations.");
+    }
+
+    rl.close();
+  });
+}
+
 detectContainerEngine();
 checkKeys();
+promptMigrations();
 
 console.log("OKAY")
