@@ -1,0 +1,19 @@
+# Roadmap
+
+## Phase 1: Basic App
+- [x] Build a simple todo app (create, update, delete)
+- [x] Use in-memory or local storage
+- [x] Basic UI for todos
+
+## Phase 2: Offline Support
+- [ ] Replace in-memory storage with **IndexedDB**
+- [ ] Make app fully functional offline
+- [ ] Detect network status and sync automatically
+
+## Phase 3: Server API & Sync
+- [ ] Handle offline operations queue
+
+## Phase 4: AI Features
+- [ ] Integrate Chrome's `LanguageModel` API for AI features
+- [ ] Rewrite todo text
+- [ ] Fix grammar/spelling
