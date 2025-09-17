@@ -2,6 +2,9 @@
 
 A **Todo application** built with **NestJS**, **Express**, **Vue**, and **MongoDB**, running in a Dockerized microservice architecture. This app is still in progress and you can see the [ROADMAP](./ROADMAP.md)
 
+> [!INFO]
+> The Project is currently in the beta and current Pharse is (Local LLM with Chrome). [Branch (LLM)](https://github.com/happer64bit/toolydooly/tree/feat/llm)
+
 *This is a verification of participation in Code2Career by the Japan-Myanmar Center, and this will be used in the portfolio of Win Khant Lin.*
 
 ---
