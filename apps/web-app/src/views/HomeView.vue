@@ -9,6 +9,11 @@ import Menu from '@/components/Menu.vue'
 import { useDebounce } from '@/lib/debounce'
 import { useFilter } from '@/stores/filter'
 import { ref, watch } from 'vue'
+import { useLLM } from '@/stores/llm'
+
+const { initModel } = useLLM()
+
+initModel()
 
 const auth = useAuth()
 const { todoQuery, createTodoMutation } = useTodoQuery()
@@ -16,6 +21,15 @@ const filter = useFilter()
 
 const search = ref('')
 const debouncedSearch = useDebounce(search, 150)
+
+const isLoading = ref(false)
+
+function handleSubmit(payload: { text: string; priority: string }) {
+    isLoading.value = true
+    createTodoMutation.mutateAsync(payload).finally(() => {
+        isLoading.value = false
+    })
+}
 
 watch(debouncedSearch, (val) => {
     filter.setSearchQuery(val)
@@ -58,8 +72,8 @@ watch(debouncedSearch, (val) => {
 
         <footer
             class="sticky bottom-0 left-0 w-full flex justify-center p-4 bg-gradient-to-b from-gray-50/10 to-gray-50 dark:from-[#212121]/10 dark:to-[#212121]">
-            <BottomChatContainer @submit="(event) => createTodoMutation.mutateAsync(event)"
-                :is-loading="createTodoMutation.isPending.value" />
+            <BottomChatContainer :is-loading="isLoading" @update:isLoading="isLoading = $event"
+                @submit="handleSubmit" />
         </footer>
     </div>
 </template>
